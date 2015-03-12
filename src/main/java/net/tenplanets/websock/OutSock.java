@@ -234,8 +234,8 @@ public class OutSock  {
 
     @OnError
     public void onError(Session session, Throwable t) {
-        //Glassfish has a bug which doesn't affect the work of websocket. 
-        //This bug clutter the log. Need to set loglevel of org.glassfish.tyrus.servlet.TyrusHttpUpgradeHandler to SEVERE      
+        //Glassfish has a bug which doesn't affect the work of websocket. This bug clutter the log. 
+        //Need to set loglevel of org.glassfish.tyrus.servlet.TyrusHttpUpgradeHandler to SEVERE      
         if (t instanceof IllegalStateException && t.getMessage().equals("Text MessageHandler already registered.")) {
             return;
         }
