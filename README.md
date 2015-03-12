@@ -1,7 +1,7 @@
 # wsock
 
 This program emulates the work of banking service, in order to spread currency exchange transactions to the interested users.
-Programm need modern browsers for work (IE10), because I use WebSockets. Websockets were chosen as most robust implementation of web communications.
+Programm need modern browsers for work (IE10), because of usage of WebSockets. Websockets were chosen as most robust implementation of web communications.
 (I also considered "comet" for this project, but decided that it is not too good - "long polling"  do new requests for each event(transaction) and have delays,
 when "streaming" stores all events in the browser's buffer up to closing of HTTP connection.)
 This project also use JMS topic in order to give the possibility to horizontally scale(deploy on several servers) this application.
