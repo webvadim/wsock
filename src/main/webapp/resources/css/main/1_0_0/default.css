@@ -1,0 +1,86 @@
+
+
+html, body {
+    height:100%;min-height: 100%;
+    margin: 10px;
+    padding: 0;   
+    font-size: 100%;
+    font-family: 'Times New Roman',Times,serif;
+    color: #000000;
+    border: none;        
+}
+
+#wrapper{
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid      #AFAFAF;
+    padding: 0px 10px 10px 10px;    
+    background-color:   #eae8d8; 
+    box-shadow:1px 1px 1px 0px #ccc ;  -moz-box-shadow:1px 1px 1px 0  #ccc ; -webkit-box-shadow:1px 1px 1px 0 #ccc ;
+    border-radius: 5px 5px 5px 5px;        -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius:  5px 5px 5px 5px ;  
+
+}
+#messages {
+    font-size: 80%;
+    background-color: #444444;
+    color: white;
+    padding: 5px;
+    margin: 10px 0;
+    border:   silver 1px solid;
+    width: 800px;
+    height:250px; 
+    overflow-y:  scroll;
+     
+
+}
+
+#warning span{
+    color:  maroon;
+    padding: 3px;
+    background-color: #f1f1cf;
+    border-radius:5px ; 
+    border:   silver 1px solid;     
+    white-space:nowrap; 
+}
+#warning{
+    margin: 10px 0;
+}
+
+
+
+
+#messages .error {
+    color:red;
+}
+
+.header{
+    font-size: 120%;
+    font-weight:  bold;
+
+}
+
+.hlink{
+    padding-left: 10px;
+}
+#input{
+    width: 800px;   
+    padding: 5px;
+    border:   silver 1px solid;
+}
+
+#input table{
+    margin: 10px 0;
+    text-align:  left;
+    padding: 5px;
+}
+
+#input th{
+    text-align:  left;
+    font-weight:   normal;
+}
+
+#stats{
+    background-color:   #edf0f0;
+    padding: 5px;
+    border:   silver 1px solid;  
+}

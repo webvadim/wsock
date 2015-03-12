@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Input</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />    
+
+        <h:outputScript target="head" library="js/main"    name="sock.js"/>
+        <h:outputStylesheet library="css/main" name="default.css"/>
+
+
+    </h:head>
+    <h:body>     
+
+        <table id="wrapper">
+            <tr>
+                <td>
+
+
+                    <div>     
+                        <span class="header">Input form</span>
+                        <span class="hlink">( <h:link outcome="index" target="_blank" value="Way to the output form..."/> )</span>            
+                    </div>
+                    <br/>
+                    <div id="warning"></div>
+
+                    <div   id="input">
+                        <table >
+                            <thead>
+                                <tr>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Rate</th>                    
+                                    <th>Amount</th>
+                                    <th> &#160;</th>   
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select  id="currencyfrom" onchange="changePair();">
+                                            <option value="EUR" selected="true" label="EUR"/>
+                                            <option value="USD"  label="USD"/>
+                                            <option value="GBP"  label="GBP"/>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select  id="currencyto" onchange="changePair();">
+                                            <option value="EUR"  label="EUR"/>
+                                            <option value="USD"  label="USD"/>
+                                            <option value="GBP" selected="true" label="GBP"/>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="rate" value="0.7471"/>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="amount" value="1000"/>
+                                    </td>
+                                    <td>
+                                        <button type="button" onclick="go();" >Do</button>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+
+                    <div id="messages" ></div>
+
+
+                    <div>
+                        <button type="button" onclick="tenplanets.clearMessages();" >Clear messages</button>
+                        <button type="button" onclick="tenplanets.reopenSocket();" >Reopen connection</button>
+                        <button type="button" onclick="tenplanets.openSocket();" >Open connection</button>
+                        <button type="button" onclick="tenplanets.closeSocket();" >Close connection</button>
+
+                    </div>
+                </td>
+            </tr>
+
+        </table>
+
+
+        <h:outputScript target="body">
+            //<![CDATA[
+            tenplanets.rates = new Array("EUR/GBP:0.7471", "GBP/EUR:1.3385", "GBP/USD:1.5100", "USD/GBP:0.6623", "EUR/USD:1.0855", "USD/EUR:0.9212");
+
+
+            if (typeof WebSocket === "undefined") {   
+            document.getElementById("warning").innerHTML='<span>You need  a browser which supports WebSockets in order to work with this form.</span>';
+            }
+
+            tenplanets.webSocketUrl="wss://"+document.location.host+"#{facesContext.externalContext.requestContextPath}/datainp";
+
+            window.onload = function(){
+            tenplanets.openSocket();
+            }
+
+            window.onunload= function(){        
+            tenplanets.closeSocket();        
+            }
+
+            function send(msg) {
+
+        if (tenplanets.webSocket && (tenplanets.webSocket.readyState !== WebSocket.OPEN)) {
+            tenplanets.message("Connection is not opened.");
+        }
+
+        if ((msg.amountBuy === 0 || msg.amountSell === 0)) {
+            return;
+        }
+        if (msg.currencyTo === msg.currencyFrom) {
+            return;
+        }
+
+        msg.userId = "134256";
+        var now = new Date();
+        msg.timePlaced = now.getUTCDate() + "-" + tenplanets.months[now.getUTCMonth()] + "-" + now.getUTCFullYear() + " " + now.toLocaleTimeString();
+        msg.originatingCountry = "FR";
+        var str = JSON.stringify(msg);
+        tenplanets.webSocket.send(str);
+
+    }
+
+
+    function go() {
+
+        var msg = {};
+        msg.currencyFrom = document.getElementById("currencyfrom").value;
+        msg.currencyTo = document.getElementById("currencyto").value;
+        msg.rate = parseFloat(document.getElementById("rate").value);
+        msg.amountSell = parseFloat(document.getElementById("amount").value);
+        msg.amountSell = parseFloat(msg.amountSell.toFixed(4));
+        msg.amountBuy = msg.amountSell * msg.rate;
+        msg.amountBuy = parseFloat(msg.amountBuy.toFixed(4));
+
+        send(msg);
+
+    }
+
+
+
+
+    function changePair() {
+        var currencyFrom = document.getElementById("currencyfrom").value;
+        var currencyTo = document.getElementById("currencyto").value;
+        var pair = currencyFrom + "/" + currencyTo;
+
+        for (var i = 0; i < tenplanets.rates.length; i++) {
+            if (tenplanets.rates[i].indexOf(pair) === 0) {
+                document.getElementById("rate").value = tenplanets.rates[i].substring(8);
+                return;
+            }
+            ;
+            document.getElementById("rate").value = 0;
+
+        }
+    }
+
+
+    var showMessage = tenplanets.message;
+    tenplanets.message = function (text) {
+        try {
+
+            var obj = JSON.parse(text);
+            var pair = obj.currencyFrom + "/" + obj.currencyTo;
+            var data = {"pair": pair, "rate": obj.rate, "sell": obj.amountSell, "buy": obj.amountBuy, "user": obj.userId, "time": obj.timePlaced, "country": obj.originatingCountry}
+            var str = JSON.stringify(data);
+
+            if (obj.result >= 0) {
+                showMessage(str, "trans");
+
+            } else {
+                showMessage(str, "trans error");
+                showMessage('{"error":"' + obj.message + '"}', "data error");
+
+
+            }
+
+        } catch (err) {
+            document.getElementById("messages").innerHTML += ('<br/>' + '<span class="txt">' + text + '</span>');
+        }
+
+    }
+
+            //]]> </h:outputScript>
+
+
+
+
+    </h:body>
+</html>
+

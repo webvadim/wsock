@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+      
+      <distributable/>
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Production</param-value>
+    </context-param>
+     
+ <context-param>
+        <param-name>org.glassfish.tyrus.maxSessionsPerApp</param-name>
+        <param-value>5000</param-value>
+    </context-param>
+    
+   
+
+
+   
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <listener>
+        <description>ServletContextListener</description>
+        <listener-class>net.tenplanets.websock.ApplicationListener</listener-class>
+    </listener>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            60
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>faces/index.xhtml</welcome-file>
+    </welcome-file-list>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/WEB-INF/jsp/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/jsp/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/jsp/error.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>com.sun.faces.context.FacesFileNotFoundException</exception-type>
+        <location>/WEB-INF/jsp/error.jsp</location>
+    </error-page>
+    <security-constraint>
+        <display-name>Websocket constraint</display-name>
+        <web-resource-collection>
+            <web-resource-name>Websocket end point</web-resource-name>
+            <description/>
+           
+            <url-pattern>/inp</url-pattern>
+            <url-pattern>/faces/input.xhtml</url-pattern>
+           
+        </web-resource-collection>
+        <auth-constraint>
+            <description/>
+            <role-name>test</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <description/>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>file</realm-name>
+    </login-config>
+    <security-role>
+        <description/>
+        <role-name>test</role-name>
+    </security-role>
+    <resource-ref>
+        <res-ref-name>jms/websockConnectionFactory</res-ref-name>
+        <res-type>javax.jms.ConnectionFactory</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+    </resource-ref>    
+    
+    <message-destination-ref>
+        <message-destination-ref-name>jms/websockTopic</message-destination-ref-name>
+        <message-destination-type>javax.jms.Topic</message-destination-type>
+        <message-destination-usage>ConsumesProduces</message-destination-usage>
+        <message-destination-link>jms/websockTopic</message-destination-link>
+    </message-destination-ref>
+</web-app>

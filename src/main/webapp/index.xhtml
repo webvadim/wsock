@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>Presentation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />  
+        <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+        <h:outputScript target="head" library="js/main"    name="sock.js"/>    
+        <h:outputStylesheet library="css/main" name="default.css"/>
+        <h:outputScript target="head" library="js/chartjs"    name="Chart.min.js"/>
+
+
+        <style type="text/css">
+            .label{
+                width:15px; height:15px; display:  inline-block; border:  silver 1px solid;
+            }
+           
+
+        </style>
+
+    </h:head>
+    <h:body>      
+
+        <table id="wrapper">
+            <tr>
+                <td>
+                    <div>     
+                        <span class="header">Presentation form</span>
+                        <span class="hlink">( <h:link outcome="input" target="_blank" value="Way to the input form..."/> User name/password: test/test )</span>            
+                    </div>
+                    <br/>
+
+                    <div id="warning" ></div>
+
+
+                    <div class="chart-header">This diagram simply shows totals of incoming messages. Just an example. There is no real calculations. </div>
+                    <canvas id="stats" width="800" height="250"></canvas>
+                    <div  style=" padding: 30px 0 0 0;">
+                        <div  class='label' style="background-color: rgba(220,220,220,0.8);"></div> Buing
+                        <div  class='label' style="background-color: rgba(151,187,205,0.8);"></div> Selling
+                    </div>
+                    <div id="messages"  ></div>
+
+                    <div>
+                        <button type="button" onclick="tenplanets.clearMessages();" >Clear messages</button>
+                        <button type="button" onclick="tenplanets.reopenSocket();" >Reopen connection</button>
+                        <button type="button" onclick="tenplanets.openSocket();" >Open connection</button>
+                        <button type="button" onclick="tenplanets.closeSocket();" >Close connection</button>
+
+                    </div>
+                </td>
+            </tr>
+
+        </table>
+
+        <h:outputScript target="body"> 
+            //<![CDATA[
+
+
+            if (typeof WebSocket === "undefined") {   
+            document.getElementById("warning").innerHTML='<span>You need  a browser which supports WebSockets in order to work with this form.</span>';
+            }
+
+            var dataCounter=0;
+
+            if (document.location.protocol==="https:"){
+            tenplanets.webSocketUrl="wss://"+document.location.host+"#{facesContext.externalContext.requestContextPath}/dataout";
+            }else{
+            tenplanets.webSocketUrl="ws://"+document.location.host+"#{facesContext.externalContext.requestContextPath}/dataout";
+            }
+
+            window.onload = function(){
+            tenplanets.openSocket();
+            }
+
+            window.onunload= function(){        
+            tenplanets.closeSocket();        
+            }
+
+
+    var data = {
+        labels: ["EUR/GBP", "GBP/EUR", "GBP/USD", "USD/GBP", "EUR/USD", "USD/EUR"],
+        datasets: [
+            {
+                label: "Buing",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,0.8)",
+                highlightFill: "rgba(220,220,220,0.75)",
+                highlightStroke: "rgba(220,220,220,1)",
+                data: [0, 0, 0, 0, 0, 0]
+            },
+            {
+                label: "Selling",
+                fillColor: "rgba(151,187,205,0.7)",
+                strokeColor: "rgba(151,187,205,0.8)",
+                highlightFill: "rgba(151,187,205,0.75)",
+                highlightStroke: "rgba(151,187,205,1)",
+                data: [0, 0, 0, 0, 0, 0]
+            }
+        ]
+    };
+
+    var ctx = document.getElementById("stats").getContext("2d");
+    var chart = new Chart(ctx).Bar(data);
+    
+    
+    
+
+    function setPair(pair, buy, sell, mode) {
+        for (var i = 0; i < data.labels.length; i++) {
+            if (pair === data.labels[i]) {
+                break;
+            }
+        }
+        if (mode===0){
+           chart.datasets[0].bars[i].value = buy;
+           chart.datasets[1].bars[i].value = sell;
+        }else{
+           chart.datasets[0].bars[i].value = parseFloat((chart.datasets[0].bars[i].value + buy).toFixed(4));
+           chart.datasets[1].bars[i].value = parseFloat((chart.datasets[1].bars[i].value + sell).toFixed(4));
+        }
+    }
+
+    var showMessage = tenplanets.message;
+
+    tenplanets.message = function (text) {
+        try {
+
+            var obj = JSON.parse(text);
+
+            if (obj.msgType === 2) {
+
+                dataCounter = obj.counter;
+ 
+                for (var i = 0; i < obj.entries.length; i++) {
+                    setPair(obj.entries[i].pair, obj.entries[i].buyAmount, obj.entries[i].sellAmount,0);
+                }
+                chart.update();
+            } else if (obj.msgType === 1) {
+                var pair = obj.currencyFrom + "/" + obj.currencyTo;
+               
+                if (obj.counter > dataCounter) {
+                    setPair(pair, obj.amountBuy, obj.amountSell,1);
+                    chart.update();
+                }
+                var data = {"pair": pair, "rate": obj.rate, "sell": obj.amountSell, "buy": obj.amountBuy, "user": obj.userId, "time": obj.timePlaced, "country": obj.originatingCountry}
+                var str = JSON.stringify(data);
+                showMessage(str, "trans");
+
+            } else {
+                showMessage(text, "data");
+            }
+
+        } catch (err) {
+            showMessage(text, "txt");
+        }
+
+    }
+        
+
+            //]]></h:outputScript>
+
+
+
+
+    </h:body>
+</html>
+
