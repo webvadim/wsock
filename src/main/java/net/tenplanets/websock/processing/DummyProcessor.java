@@ -63,8 +63,7 @@ public class DummyProcessor implements Processable {
      * initial graph.
      *
      * The db transaction can be less strict, providing that increasing of
-     * values in the Stats will be atomic - for example if a Stat will be stored
-     * in the mongoDb database.    
+     * values in the Stats will be atomic.
      */
     public synchronized Stat writeMessage(Msg msg) {
 
