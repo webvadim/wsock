@@ -60,10 +60,7 @@ public class DummyProcessor implements Processable {
      * graphical presentation of statistics to the user: I draw the initial
      * statistic graph only once in the presentation view, and then update this
      * view by new transactions(msgs) which have counter greater than in the
-     * initial graph.
-     *
-     * The db transaction can be less strict, providing that increasing of
-     * values in the Stats will be atomic.
+     * initial graph.  
      */
     public synchronized Stat writeMessage(Msg msg) {
 
