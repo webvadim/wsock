@@ -39,10 +39,10 @@ public class Stat extends AbstractPersistentEntity implements Serializable, Clon
     public static Date removeTime(Date dt) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTime(dt);
-        cal.clear(Calendar.HOUR);
-        cal.clear(Calendar.MINUTE);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MILLISECOND);
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
 
         return cal.getTime();
     }
