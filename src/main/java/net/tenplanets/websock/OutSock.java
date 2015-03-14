@@ -41,8 +41,8 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Vadims Zemlanojs <vadim@tenplanets.net>
  */
-@ServerEndpoint(value = "/dataout",  configurator= CustomConfigurator.class,  decoders = {JsonDecoder.class}, encoders = {JsonEncoder.class})
-public class OutSock  {
+@ServerEndpoint(value = "/dataout", configurator = CustomConfigurator.class, decoders = {JsonDecoder.class}, encoders = {JsonEncoder.class})
+public class OutSock {
 
     private static final Logger logger = Logger.getLogger(OutSock.class.getName());
 
@@ -60,10 +60,8 @@ public class OutSock  {
     public static class CustomConfigurator extends ServerEndpointConfig.Configurator {
 
         @Override
-        public void modifyHandshake(ServerEndpointConfig conf, HandshakeRequest req, HandshakeResponse resp) {         
-          
-            logger.log(Level.FINE, "WebSocket {0} handshake on URI {1} from origin {2}", new Object[]{OutSock.class.getName(), req.getRequestURI(), req.getHeaders().get("origin")});
-
+        public void modifyHandshake(ServerEndpointConfig conf, HandshakeRequest req, HandshakeResponse resp) {
+            logger.log(Level.FINE, "WebSocket handshake on URI {0} from origin {1}", new Object[]{req.getRequestURI(), req.getHeaders().get("origin")});
         }
     }
 
@@ -151,7 +149,7 @@ public class OutSock  {
                                             }
 
                                         } catch (Exception e) {
-                                            logger.log(Level.WARNING, "WebSocket unknown error in message processing: {0}.", e.getMessage());
+                                            logger.log(Level.WARNING, "WebSocket unknown error in message processing: " + e.getMessage(), e);
                                         }
                                     } else {
                                         it.remove();
@@ -192,9 +190,7 @@ public class OutSock  {
     @OnOpen
     public void onOpen(Session session, EndpointConfig conf) {//throws EncodeException {     
 
-       
-      
-        if (!peers.contains(session)) {//Bug in Glassfish. Can be calld twice
+        if (!peers.contains(session)) {//Bug in Glassfish. Can be calld twice. This check is workaround for Windows only. 
             peers.add(session);
             logger.log(Level.FINE, "WebSocket connected: {0}", session.getId());
 
@@ -229,12 +225,12 @@ public class OutSock  {
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
         peers.remove(session);
-        logger.log(Level.FINE, "WebSocket connection closed: {0}", session.getId());
+        logger.log(Level.FINE, "WebSocket connection was closed: {0}, active connections count: {1}", new Object[]{session.getId(), session.getOpenSessions().size()});
     }
 
     @OnError
     public void onError(Session session, Throwable t) {
-        //Glassfish has a bug which doesn't affect the work of websocket.  This bug clutter the log. 
+        //Glassfish has a bug. This bug clutter the log. 
         //Need to set loglevel of org.glassfish.tyrus.servlet.TyrusHttpUpgradeHandler to SEVERE      
         if (t instanceof IllegalStateException && t.getMessage().equals("Text MessageHandler already registered.")) {
             return;

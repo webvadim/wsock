@@ -10,7 +10,11 @@ In case of distributed deployment it have to be changed to the real database.
 Processing of transactions is also almost an emulation. I just sums incoming values by currency exchange pairs to show this information to users in real time.
 UI of program consist of to web pages: presentation (with graph) and a message generator page.
 
-The program should be accessible on the http://websock.tenplanets.net but currently I have the problem with deployment on Glassfish under Linux (the same version of Glassfish under Windows works fine).
-It looks like a bug with websockets in the Glassfish. I hope to fix it soon. For the time being you can download this program and try it in your java container.
-(The endpoint for incoming messages from an external program should be wss://websock.tenplanets.net/datainp ,with bacic authentification header: test/test, and with accepting of unvalid SSL server sertificates)
-
+The program is accessible on the http://websock.tenplanets.net 
+(The endpoint for incoming messages from an external program is wss://websock.tenplanets.net/datainp,
+with basic authentification header: test/test, and with accepting of unvalid SSL server sertificates)
+Note:
+I had a big problem with deployment on Glassfish under Linux (the same version of Glassfish under Windows worked fine).
+It looks like a bug with websockets in the Glassfish and in tyrus library. The first problem was resolved by upgrading of Glassfish up to 4.1.
+The bug in the tyrus, which prevents normal deployment on the Linux is open on this day. 
+Need to disable logging in the Glassfish for the project(virtual host) in order to avoid troubles.
