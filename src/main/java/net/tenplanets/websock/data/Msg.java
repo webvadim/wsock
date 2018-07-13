@@ -22,7 +22,8 @@ import org.codehaus.jettison.json.JSONObject;
 public class Msg extends AbstractPersistentEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String DATE_PATTERN = "dd-MMM-yyyy HH:mm:ss";
+    // private static final String DATE_PATTERN = "dd-MMM-yyyy HH:mm:ss";
+    private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
     private static final String[] months = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
     private Long id = 0L;
@@ -60,11 +61,10 @@ public class Msg extends AbstractPersistentEntity implements Serializable {
         String time = obj.getString("timePlaced");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.US);
 
-        DateFormatSymbols dfs = simpleDateFormat.getDateFormatSymbols();
+        /* DateFormatSymbols dfs = simpleDateFormat.getDateFormatSymbols();
         dfs.setShortMonths(months);
-        simpleDateFormat.setDateFormatSymbols(dfs);
-
-        timePlaced = simpleDateFormat.parse(time);
+        simpleDateFormat.setDateFormatSymbols(dfs);*/ 
+        timePlaced = simpleDateFormat.parse(time);    
 
     }
 

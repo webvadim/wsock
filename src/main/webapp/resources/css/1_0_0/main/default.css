@@ -15,14 +15,15 @@ html, body {
     margin-right: auto;
     border: 1px solid      #AFAFAF;
     padding: 0px 10px 10px 10px;    
-    background-color:   #eae8d8; 
-    box-shadow:1px 1px 1px 0px #ccc ;  -moz-box-shadow:1px 1px 1px 0  #ccc ; -webkit-box-shadow:1px 1px 1px 0 #ccc ;
+    /*  background-color:   #eae8d8; */
+    background-color: #f8f5ea;     
+    box-shadow: 0px 0px 7px 1px #ccc;     -moz-box-shadow:0px 0px 7px 1px #ccc; -webkit-box-shadow:0px 0px 7px 1px #ccc;
     border-radius: 5px 5px 5px 5px;        -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius:  5px 5px 5px 5px ;  
 
 }
 #messages {
-    font-size: 80%;
-    background-color: #444444;
+    font-size: 80%;    
+    background-color: #222;
     color: white;
     padding: 5px;
     margin: 10px 0;
@@ -30,7 +31,7 @@ html, body {
     width: 800px;
     height:250px; 
     overflow-y:  scroll;
-     
+
 
 }
 

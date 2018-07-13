@@ -9,8 +9,8 @@
 
         <meta http-equiv="X-UA-Compatible" content="IE=Edge" />    
 
-        <h:outputScript target="head" library="js/main"    name="sock.js"/>
-        <h:outputStylesheet library="css/main" name="default.css"/>
+        <h:outputScript target="head" library="js"    name="main/sock.js"/>
+        <h:outputStylesheet library="css" name="main/default.css"/>
 
 
     </h:head>
@@ -23,7 +23,7 @@
 
                     <div>     
                         <span class="header">Input form</span>
-                        <span class="hlink">( <h:link outcome="index" target="_blank" value="Way to the output form..."/> )</span>            
+                        <span class="hlink">( <h:link outcome="index" target="_blank" value="to the output form..."/> )</span>            
                     </div>
                     <br/>
                     <div id="warning"></div>
@@ -98,7 +98,8 @@
             document.getElementById("warning").innerHTML='<span>You need  a browser which supports WebSockets in order to work with this form.</span>';
             }
 
-            tenplanets.webSocketUrl="wss://"+document.location.host+"#{facesContext.externalContext.requestContextPath}/datainp";
+            // tenplanets.webSocketUrl="wss://"+document.location.host+"#{facesContext.externalContext.requestContextPath}/datainp";
+            tenplanets.webSocketUrl="ws://"+document.location.host+"#{facesContext.externalContext.requestContextPath}/datainp";
 
             window.onload = function(){
             tenplanets.openSocket();
@@ -110,86 +111,89 @@
 
             function send(msg) {
 
-        if (tenplanets.webSocket && (tenplanets.webSocket.readyState !== WebSocket.OPEN)) {
+            if (tenplanets.webSocket && (tenplanets.webSocket.readyState !== WebSocket.OPEN)) {
             tenplanets.message("Connection is not opened.");
-        }
+            }
 
-        if ((msg.amountBuy === 0 || msg.amountSell === 0)) {
+            if ((msg.amountBuy === 0 || msg.amountSell === 0)) {
             return;
-        }
-        if (msg.currencyTo === msg.currencyFrom) {
+            }
+            if (msg.currencyTo === msg.currencyFrom) {
             return;
-        }
+            }
 
-        msg.userId = "134256";
-        var now = new Date();
-        msg.timePlaced = now.getUTCDate() + "-" + tenplanets.months[now.getUTCMonth()] + "-" + now.getUTCFullYear() + " " + now.toLocaleTimeString();
-        msg.originatingCountry = "FR";
-        var str = JSON.stringify(msg);
-        tenplanets.webSocket.send(str);
+            msg.userId = "134256";
+            var now = new Date();
+            //msg.timePlaced = now.getUTCDate() + "-" + tenplanets.months[now.getUTCMonth()] + "-" + now.getUTCFullYear() + " " + now.toLocaleTimeString('ru');
+            msg.timePlaced = now.toJSON();
+            msg.originatingCountry = "FR";           
+            var str = JSON.stringify(msg);         
+            tenplanets.webSocket.send(str);
 
-    }
-
-
-    function go() {
-
-        var msg = {};
-        msg.currencyFrom = document.getElementById("currencyfrom").value;
-        msg.currencyTo = document.getElementById("currencyto").value;
-        msg.rate = parseFloat(document.getElementById("rate").value);
-        msg.amountSell = parseFloat(document.getElementById("amount").value);
-        msg.amountSell = parseFloat(msg.amountSell.toFixed(4));
-        msg.amountBuy = msg.amountSell * msg.rate;
-        msg.amountBuy = parseFloat(msg.amountBuy.toFixed(4));
-
-        send(msg);
-
-    }
+            }
 
 
+            function go() {
+
+            var msg = {};
+            msg.currencyFrom = document.getElementById("currencyfrom").value;
+            msg.currencyTo = document.getElementById("currencyto").value;
+            msg.rate = parseFloat(document.getElementById("rate").value);
+            msg.amountSell = parseFloat(document.getElementById("amount").value);
+            msg.amountSell = parseFloat(msg.amountSell.toFixed(4));
+            msg.amountBuy = msg.amountSell * msg.rate;
+            msg.amountBuy = parseFloat(msg.amountBuy.toFixed(4));
+
+            send(msg);
+
+            }
 
 
-    function changePair() {
-        var currencyFrom = document.getElementById("currencyfrom").value;
-        var currencyTo = document.getElementById("currencyto").value;
-        var pair = currencyFrom + "/" + currencyTo;
 
-        for (var i = 0; i < tenplanets.rates.length; i++) {
+
+            function changePair() {
+            var currencyFrom = document.getElementById("currencyfrom").value;
+            var currencyTo = document.getElementById("currencyto").value;
+            var pair = currencyFrom + "/" + currencyTo;
+
+            for (var i = 0; i < tenplanets.rates.length; i++) {
             if (tenplanets.rates[i].indexOf(pair) === 0) {
-                document.getElementById("rate").value = tenplanets.rates[i].substring(8);
-                return;
+            document.getElementById("rate").value = tenplanets.rates[i].substring(8);
+            return;
             }
             ;
             document.getElementById("rate").value = 0;
 
-        }
-    }
+            }
+            }
 
 
-    var showMessage = tenplanets.message;
-    tenplanets.message = function (text) {
-        try {
+            var showMessage = tenplanets.message;
+            tenplanets.message = function (text) {
+            try {
 
             var obj = JSON.parse(text);
-            var pair = obj.currencyFrom + "/" + obj.currencyTo;
-            var data = {"pair": pair, "rate": obj.rate, "sell": obj.amountSell, "buy": obj.amountBuy, "user": obj.userId, "time": obj.timePlaced, "country": obj.originatingCountry}
+            var pair = obj.currencyFrom + "/" + obj.currencyTo;  
+            
+            //var data = {"pair": pair, "rate": obj.rate, "sell": obj.amountSell, "buy": obj.amountBuy, "user": obj.userId, "time": obj.timePlaced, "country": obj.originatingCountry}
+            var data = {"pair": pair, "rate": obj.rate, "sell": obj.amountSell, "buy": obj.amountBuy, "user": obj.userId, "time": new Date(obj.timePlaced).toUTCString(), "country": obj.originatingCountry}
             var str = JSON.stringify(data);
 
             if (obj.result >= 0) {
-                showMessage(str, "trans");
+            showMessage(str, "trans");
 
             } else {
-                showMessage(str, "trans error");
-                showMessage('{"error":"' + obj.message + '"}', "data error");
+            showMessage(str, "trans error");
+            showMessage('{"error":"' + obj.message + '"}', "data error");
 
 
             }
 
-        } catch (err) {
+            } catch (err) {
             document.getElementById("messages").innerHTML += ('<br/>' + '<span class="txt">' + text + '</span>');
-        }
+            }
 
-    }
+            }
 
             //]]> </h:outputScript>
 

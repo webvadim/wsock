@@ -53,7 +53,7 @@
         <exception-type>com.sun.faces.context.FacesFileNotFoundException</exception-type>
         <location>/WEB-INF/jsp/error.jsp</location>
     </error-page>
-    <security-constraint>
+    <!--  <security-constraint>
         <display-name>Websocket constraint</display-name>
         <web-resource-collection>
             <web-resource-name>Websocket end point</web-resource-name>
@@ -71,7 +71,7 @@
             <description/>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>
+    </security-constraint>-->
     <login-config>
         <auth-method>BASIC</auth-method>
         <realm-name>file</realm-name>
